@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,6 +19,7 @@ Route::prefix('auth')->group(function () {
 Route::middleware(['auth:sanctum', 'token.refresh'])->group(function () {
     // Auth routes
     Route::prefix('auth')->group(function () {
+        Route::get('/user', [LoginController::class, 'me']);
         Route::post('/logout', [LoginController::class, 'logout']);
         Route::post('/refresh-token', [LoginController::class, 'refreshToken']);
         Route::get('/me', [LoginController::class, 'me']);
