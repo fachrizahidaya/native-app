@@ -43,6 +43,16 @@ class LoginController extends Controller
             ], 401);
         }
 
+        // Check if user has verified their email
+        if (!$user->is_verified) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please verify your email address first. Check your email for the OTP code.',
+                'requires_verification' => true,
+                'email' => $user->email
+            ], 403);
+        }
+
         $tokenData = $this->tokenService->createToken($user);
 
         return response()->json([

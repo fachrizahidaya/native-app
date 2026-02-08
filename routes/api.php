@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +14,12 @@ use Illuminate\Support\Facades\Route;
 // Public routes
 Route::prefix('auth')->group(function () {
     Route::post('/login', [LoginController::class, 'login']);
+    
+    // Registration routes
+    Route::post('/register', [RegisterController::class, 'register']);
+    Route::post('/check-username', [RegisterController::class, 'checkUsername']);
+    Route::post('/verify-otp', [RegisterController::class, 'verifyOtp']);
+    Route::post('/resend-otp', [RegisterController::class, 'resendOtp']);
 });
 
 // Protected routes with auto token refresh
