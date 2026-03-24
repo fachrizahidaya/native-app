@@ -18,17 +18,18 @@ class OtpService
     /**
      * Create and store OTP for user
      */
-    public function createOtp(User $user): string
-    {
-        $otp = $this->generateOtp();
-        
-        $user->update([
-            'otp' => $otp,
-            'otp_expires_at' => Carbon::now()->addMinutes(10), // OTP valid for 10 minutes
-        ]);
+   public function createOtp(User $user): string
+{
+    $otp = $this->generateOtp();
+    
+    $user->update([
+        'otp' => $otp,
+        'otp_expires_at' => Carbon::now()->addMinutes(10),
+        'otp_last_sent_at' => Carbon::now(), // ✅ ADD THIS
+    ]);
 
-        return $otp;
-    }
+    return $otp;
+}
 
     /**
      * Verify OTP for user
@@ -58,16 +59,14 @@ class OtpService
     /**
      * Check if user can request new OTP (rate limiting)
      */
-    public function canRequestOtp(User $user): bool
-    {
-        // If no OTP or OTP expired, can request
-        if (!$user->otp_expires_at) {
-            return true;
-        }
-
-        // Allow new OTP request if current one is expired
-        return Carbon::now()->isAfter($user->otp_expires_at);
+   public function canRequestOtp(User $user): bool
+{
+    if (!$user->otp_last_sent_at) {
+        return true;
     }
+
+    return Carbon::now()->diffInSeconds($user->otp_last_sent_at) > 60;
+}
 
     /**
      * Resend OTP to user
@@ -80,4 +79,9 @@ class OtpService
 
         return $this->createOtp($user);
     }
+
+    public function forceResendOtp(User $user): string
+{
+    return $this->createOtp($user);
+}
 }
