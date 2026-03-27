@@ -45,10 +45,9 @@ class LoginController extends Controller
         ], 401);
     }
 
-    // 🚨 If not verified → resend OTP
+    // If not verified → resend OTP
     if (!$user->is_verified) {
 
-        // OPTIONAL: prevent spam (cooldown 1 minute)
         if ($user->otp_last_sent_at && now()->diffInSeconds($user->otp_last_sent_at) < 60) {
             return response()->json([
                 'success' => false,
@@ -60,7 +59,6 @@ class LoginController extends Controller
 
         // Generate new OTP
        $otp = app(OtpService::class)->forceResendOtp($user);
-$user->notify(new OtpNotification($otp));
 
         // Send OTP
         $user->notify(new OtpNotification($otp));
@@ -89,6 +87,7 @@ $user->notify(new OtpNotification($otp));
                 'name' => $user->name,
                 'email' => $user->email,
                 'role' => $user->role,
+                'is_verified' => $user->is_verified,
             ],
             ...$tokenData,
         ]
