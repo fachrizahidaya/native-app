@@ -20,7 +20,7 @@ Route::prefix('auth')->group(function () {
     // Registration routes
     Route::post('/register', [RegisterController::class, 'register']);
     Route::post('/check-username', [RegisterController::class, 'checkUsername']);
-    Route::post('/verify-otp', [RegisterController::class, 'verifyOtp']);
+    Route::post('/verify-otp', [RegisterController::class, 'verify']);
     Route::post('/resend-otp', [RegisterController::class, 'resendOtp']);
 });
 

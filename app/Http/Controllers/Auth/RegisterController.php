@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Notifications\OtpNotification;
 use App\Services\OtpService;
+use App\Services\TokenService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -53,7 +54,6 @@ class RegisterController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'username' => 'required|string|min:3|max:50|unique:users,username|alpha_dash',
             'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'password_confirmation' => 'required|string|min:8',
@@ -61,8 +61,6 @@ class RegisterController extends Controller
             'password.confirmed' => 'The password and password confirmation do not match.',
             'password_confirmation.required' => 'Password confirmation is required.',
             'password_confirmation.min' => 'Password confirmation must be at least 8 characters.',
-            'username.alpha_dash' => 'Username may only contain letters, numbers, dashes and underscores.',
-            'username.unique' => 'This username is already taken.',
             'email.unique' => 'This email is already registered.',
         ]);
 
@@ -78,7 +76,6 @@ class RegisterController extends Controller
             // Create user
             $user = User::create([
                 'name' => $request->name,
-                'username' => $request->username,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role' => 'member', // Default role
@@ -94,7 +91,6 @@ class RegisterController extends Controller
                 'data' => [
                     'user_id' => $user->id,
                     'email' => $user->email,
-                    'username' => $user->username,
                 ]
             ], 201);
         } catch (\Exception $e) {
@@ -159,7 +155,6 @@ class RegisterController extends Controller
                 'user' => [
                     'id' => $user->id,
                     'name' => $user->name,
-                    'username' => $user->username,
                     'email' => $user->email,
                     'role' => $user->role,
                 ],
@@ -167,6 +162,55 @@ class RegisterController extends Controller
             ]
         ]);
     }
+
+    public function verify(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'otp' => 'required|string|size:6',
+    ]);
+
+    $user = User::where('email', $request->email)->first();
+
+    if (!$user) {
+        return response()->json([
+            'success' => false,
+            'message' => 'User not found',
+        ], 404);
+    }
+
+    if ($user->is_verified) {
+        return response()->json([
+            'success' => false,
+            'message' => 'User already verified',
+        ], 400);
+    }
+
+    $isValid = $this->otpService->verifyOtp($user, $request->otp);
+
+    if (!$isValid) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid or expired OTP',
+        ], 400);
+    }
+
+    $tokenData = app(TokenService::class)->createToken($user);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Verification successful',
+        'data' => [
+            ...$tokenData,
+            'user' => [
+                'id' => $user->id,
+                'email' => $user->email,
+            ]
+        ]
+    ]);
+}
+
+
 
     /**
      * Resend OTP

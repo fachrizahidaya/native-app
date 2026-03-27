@@ -25,7 +25,7 @@ class OtpService
     $user->update([
         'otp' => $otp,
         'otp_expires_at' => Carbon::now()->addMinutes(10),
-        'otp_last_sent_at' => Carbon::now(), // ✅ ADD THIS
+        'otp_last_sent_at' => Carbon::now(),
     ]);
 
     return $otp;
@@ -55,6 +55,8 @@ class OtpService
 
         return true;
     }
+
+    
 
     /**
      * Check if user can request new OTP (rate limiting)
