@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\GroceryBudgetController;
+use App\Http\Controllers\GroceryExpenseController;
 use App\Services\OtpService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -33,6 +35,22 @@ Route::middleware(['auth:sanctum', 'token.refresh'])->group(function () {
         Route::post('/refresh-token', [LoginController::class, 'refreshToken']);
         Route::get('/me', [LoginController::class, 'me']);
     });
+
+    Route::get('/groceries/budgets', [GroceryBudgetController::class, 'index']);
+    Route::post('/groceries/budgets', [GroceryBudgetController::class, 'store']);
+    Route::get('/groceries/budgets/{grocery}', [GroceryBudgetController::class, 'show']);
+    Route::put('/groceries/budgets/{grocery}', [GroceryBudgetController::class, 'update']);
+    Route::patch('/groceries/budgets/{grocery}', [GroceryBudgetController::class, 'update']);
+    Route::delete('/groceries/budgets/{grocery}', [GroceryBudgetController::class, 'destroy']);
+
+    // Grocery Expenses
+    Route::get('/groceries/budgets/{grocery}/expenses', [GroceryExpenseController::class, 'index']);
+    Route::post('/groceries/budgets/{grocery}/expenses', [GroceryExpenseController::class, 'store']);
+    Route::get('/groceries/budgets/{grocery}/expenses/{expense}', [GroceryExpenseController::class, 'show']);
+    Route::put('/groceries/budgets/{grocery}/expenses/{expense}', [GroceryExpenseController::class, 'update']);
+    Route::patch('/groceries/budgets/{grocery}/expenses/{expense}', [GroceryExpenseController::class, 'update']);
+    Route::delete('/groceries/budgets/{grocery}/expenses/{expense}', [GroceryExpenseController::class, 'destroy']);
+    Route::apiResource('groceries', GroceryBudgetController::class);
 
     // Admin only routes - can access everything
     Route::middleware('admin')->prefix('admin')->group(function () {
