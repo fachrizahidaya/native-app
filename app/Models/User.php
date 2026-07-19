@@ -66,4 +66,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(GroceryBudget::class);
     }
+
+    public function notes(): HasMany
+    {
+        return $this->hasMany(Note::class);
+    }
+
+    public function homework(): HasMany
+    {
+        return $this->hasMany(Homework::class);
+    }
 }

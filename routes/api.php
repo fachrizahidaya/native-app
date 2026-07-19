@@ -4,6 +4,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\GroceryBudgetController;
 use App\Http\Controllers\GroceryExpenseController;
+use App\Http\Controllers\HomeworkController;
+use App\Http\Controllers\NoteController;
 use App\Services\OtpService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -43,6 +45,10 @@ Route::middleware(['auth:sanctum', 'token.refresh'])->group(function () {
     Route::patch('/groceries/budgets/{grocery}', [GroceryBudgetController::class, 'update']);
     Route::delete('/groceries/budgets/{grocery}', [GroceryBudgetController::class, 'destroy']);
 
+    Route::apiResource('groceries', GroceryBudgetController::class);
+    Route::apiResource('homework', HomeworkController::class);
+    Route::apiResource('notes', NoteController::class);
+    
     // Grocery Expenses
     Route::get('/groceries/budgets/{grocery}/expenses', [GroceryExpenseController::class, 'index']);
     Route::post('/groceries/budgets/{grocery}/expenses', [GroceryExpenseController::class, 'store']);
@@ -50,7 +56,13 @@ Route::middleware(['auth:sanctum', 'token.refresh'])->group(function () {
     Route::put('/groceries/budgets/{grocery}/expenses/{expense}', [GroceryExpenseController::class, 'update']);
     Route::patch('/groceries/budgets/{grocery}/expenses/{expense}', [GroceryExpenseController::class, 'update']);
     Route::delete('/groceries/budgets/{grocery}/expenses/{expense}', [GroceryExpenseController::class, 'destroy']);
-    Route::apiResource('groceries', GroceryBudgetController::class);
+
+    // Note
+    Route::get('/notes', [NoteController::class, 'index']);
+    Route::post('/notes', [NoteController::class, 'store']);
+    Route::get('/notes/{note}', [NoteController::class, 'show']);
+    Route::put('/notes/{note}', [NoteController::class, 'update']);
+    Route::delete('/notes/{note}', [NoteController::class, 'destroy']);
 
     // Admin only routes - can access everything
     Route::middleware('admin')->prefix('admin')->group(function () {
