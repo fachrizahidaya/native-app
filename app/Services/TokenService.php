@@ -8,7 +8,7 @@ use Carbon\Carbon;
 
 class TokenService
 {
-    protected int $tokenExpirationMinutes = 60;
+    protected int $tokenExpirationMinutes = 60 * 24 * 7;
     protected int $refreshThresholdMinutes = 10;
 
     /**
@@ -17,7 +17,7 @@ class TokenService
     public function createToken(User $user, string $tokenName = 'auth_token'): array
     {
         // Revoke existing tokens
-        $user->tokens()->delete();
+        $user->currentAccessToken()?->delete();
 
         // Create new token with expiration
         $token = $user->createToken(
@@ -76,6 +76,6 @@ class TokenService
      */
     public function revokeAllTokens(User $user): void
     {
-        $user->tokens()->delete();
+        $user->currentAccessToken()?->delete();
     }
 }
