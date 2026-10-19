@@ -76,4 +76,30 @@ class User extends Authenticatable
     {
         return $this->hasMany(Homework::class);
     }
+
+    public function ownedFamilies()  {
+        return $this->hasMany(Family::class, 'owner_id');
+
+
+        
+    }
+
+    public function familyMemberships()  {
+        return $this->hasMany(FamilyMember::class);
+
+
+        
+    }
+
+    public function families()  {
+        return $this->belongsToMany(Family::class, 'family_members') ->withPivot([
+            'role', 
+            'joined_at'
+        ])->withTimestamps();
+
+
+        
+    }
+
+    
 }
